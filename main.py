@@ -26,45 +26,39 @@ def isCmd(c):
   stringType = None
 
   cmd2 = ''
-  itr = -1
-  for i in cmd:
-    itr += 1
+  for itr, i in enumerate(cmd, start=-1):
     if i == stringType: stringType = None
-    if i == "'": stringType = "'"
-    if i == '"': stringType = '"'
+    if i == "'":
+      stringType = "'"
+    elif i == '"':
+      stringType = '"'
     if i == ' ' and stringType: 
       cmd2 += '¯'
     else: cmd2 += i
 
   cmd = cmd2.replace("'",'').replace('"','')
 
-  if len(cmd) > 0:
-    if cmd[-1] == ' ': 
-      cmd = cmd[:-1]
+  if len(cmd) > 0 and cmd[-1] == ' ':
+    cmd = cmd[:-1]
   parameters = cmd.split(' ')
-
-  if parameters[0] == c:
-    valid = True
-  else: valid = False
-
 
   if parameters[0] == '' and len(parameters) == 1:
     return False
-  else:
-    try:
+  valid = parameters[0] == c
+  try:
       #global tooManyArgs
-      if len(parameters) > cmdInfo[parameters[0]]['args'][1] and valid:
-        error(f"Unexpected parameter '{parameters[len(cmdInfo[c]['usage'].split(' '))]}'")
-        tooManyArgs = True
-        return False
-      elif len(parameters) < cmdInfo[parameters[0]]['args'][0] and valid:
-        tooManyArgs = True
-        error(f"Unexpected end of command.")
-        return False
-      elif valid and tooManyArgs == False:
-        return True
-    except:
+    if len(parameters) > cmdInfo[parameters[0]]['args'][1] and valid:
+      error(f"Unexpected parameter '{parameters[len(cmdInfo[c]['usage'].split(' '))]}'")
+      tooManyArgs = True
       return False
+    elif len(parameters) < cmdInfo[parameters[0]]['args'][0] and valid:
+      tooManyArgs = True
+      error('Unexpected end of command.')
+      return False
+    elif valid and not tooManyArgs:
+      return True
+  except:
+    return False
 
 # end isCmd
 
